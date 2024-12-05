@@ -1,6 +1,7 @@
 package com.oauth2.demo.authorization.server.config;
 
 import com.oauth2.demo.authorization.server.service.impl.UserService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -56,5 +57,15 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
+    }
+    @PostConstruct
+    public void testPasswordEncoder() {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String rawPassword = "password";
+        String encodedPassword = encoder.encode(rawPassword);
+        System.out.println("Encoded password: " + encodedPassword);
+        // Test if it matches
+        boolean matches = encoder.matches(rawPassword, encodedPassword);
+        System.out.println("Password matches: " + matches);
     }
 }
