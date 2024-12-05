@@ -57,8 +57,13 @@ public class AuthServerConfig {
         return http.cors().configurationSource(corsConfigurationSource())
                 .and()
                 .csrf().disable()
-                .formLogin(Customizer.withDefaults()).build();
-
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/oauth2/token", "/oauth/token").permitAll()
+                        .requestMatchers("/.well-known/jwks.json").permitAll()
+                        .requestMatchers("/oauth2/**").authenticated()
+                        .anyRequest().denyAll())
+                .formLogin(Customizer.withDefaults())
+                .build();
     }
     @Bean
     public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
@@ -91,7 +96,7 @@ public class AuthServerConfig {
     }
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+        return AuthorizationServerSettings.builder().issuer("http://localhost:19000").build();
     }
     private static RSAKey generateRsa() {
         KeyPair keyPair = generateRsaKey();
